@@ -23,7 +23,7 @@ IF NOT EXIST "%TEMP%\windpi.ps1" POWERSHELL.EXE -ExecutionPolicy Bypass -Command
 FOR /f "delims=" %%a in ('powershell -ExecutionPolicy bypass -command "%TEMP%\windpi.ps1" ') do set "WINDPI=%%a"
 
 CLS
-ECHO [Gnome-Xserver Installer 20210521]
+ECHO [Ubuntu Gnome-Xserver Installer 20210521]
 ECHO:
 ECHO Hit Enter to use your current display scaling in Windows
 SET /p WINDPI=or set the desired value (1.0 to 3.0 in .25 increments) [%WINDPI%]:
@@ -31,8 +31,7 @@ FOR /f "delims=" %%a in ('PowerShell -Command 96 * "%WINDPI%" ') do set "LINDPI=
 FOR /f "delims=" %%a in ('PowerShell -Command 32 * "%WINDPI%" ') do set "PANEL=%%a"
 FOR /f "delims=" %%a in ('PowerShell -Command 48 * "%WINDPI%" ') do set "ICONS=%%a"
 SET DISTROFULL=%temp%
-SET DISTRO=Gnome-Xserver
-SET /A SESMAN = %RDPPRT% - 50
+SET DISTRO=Ubuntu
 CD %DISTROFULL%
 %TEMP%\LxRunOffline.exe su -n %DISTRO% -v 0
 SET GO="%DISTROFULL%\LxRunOffline.exe" r -n "%DISTRO%" -c
