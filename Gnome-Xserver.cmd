@@ -49,14 +49,17 @@ START /MIN /WAIT "apt-get update" %GO% "apt-get update 2> apterr"
 FOR /F %%A in ("apterr") do If %%~zA NEQ 0 GOTO APTRELY
 
 ECHO:
-ECHO [%TIME:~0,8%] Prepare Distro (~1m00s)
+ECHO [%TIME:~0,8%] Prepare Distro (~30s)
 REM ## Install apt-fast
 %GO% "DEBIAN_FRONTEND=noninteractive apt-get -y install git gnupg2 libc-ares2 libssh2-1 libaria2-0 aria2 --no-install-recommends ; cd /tmp ; rm -rf %GITPRJ% ; git clone -b %BRANCH% --depth=1 https://github.com/%GITORG%/%GITPRJ%.git ; chmod +x /tmp/Kali-xRDP/dist/usr/local/bin/apt-fast ; cp -p /tmp/Kali-xRDP/dist/usr/local/bin/apt-fast /usr/local/bin" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Prepare Distro.log" 2>&1
 
-ECHO [%TIME:~0,8%] Install Gnome desktop metapackage (~3m00s)
+REM ## Install Gnome-Desktop
+ECHO [%TIME:~0,8%] Install Gnome desktop metapackage (~4m00s)
 %GO% "DEBIAN_FRONTEND=noninteractive apt-fast -y install ubuntu-desktop --no-install-recommends"  > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Gnome desktop.log" 2>&1
 
-
+REM ## Adding extra repos
+ECHO [%TIME:~0,8%] Adding extra repos (~30s)
+%GO% "username=$(wslvar USERNAME);mkdir --parents /mnt/c/users/$username/.ubuntu/;cd /mnt/c/users/$username/.ubuntu;apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc;sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main" > /etc/apt/sources.list.d/microsoft-prod.list'; apt update" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Adding extra repos.log" 2>&1
 
 SET RUNEND=%date% @ %time:~0,5%
 CD %DISTROFULL%
