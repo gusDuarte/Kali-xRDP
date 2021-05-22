@@ -2,14 +2,18 @@
 
 Kali-xRDP is a fully-automated script that installs xRDP on-top of Kali Linux from the Windows Store.  It works under WSL1 or WSL2 and includes optimizations and visual tweaks for a smooth and responsive desktop experience.  Display scaling is configured automatically and works on everything from standard unscaled displays all the way to xHiDPI (250%+) displays like the Microsoft Surface.
 
-Other Kali GUI installers are designed to work with WSL2 only, and therefore target newer versions of Windows.  Kali-xRDP works with Windows 10 version 1809, Windows Server 2019, Server Core, or Hyper-V Server 2019.  Running Kali in WSL1 can also be helpful for newer versions of Windows running on older hardware without VT-d, or in a virtual machine without nested virtualization support.  Note that WSL1 has limitations in its networking stack that prevent some of Kali's included tools from working as they should, so you should run Kali in WSL2 unless you're prevented from doing so for the reasons listed above.       
+Other Kali GUI installers are designed to work with WSL2 only, and therefore target newer versions of Windows.  Kali-xRDP works with Windows 10 version 1809, Windows Server 2019, Server Core, or Hyper-V Server 2019.  Running Kali in WSL1 can also be helpful for newer versions of Windows running on older hardware without VT-d, or in a virtual machine without nested virtualization support.  Note that WSL1 has limitations in its networking stack that prevent some of Kali's included tools from working as they should, so you should run Kali in WSL2 unless you're prevented from doing so for the reasons listed above.
 
-The install script is meant to be run on a new Kali Linux installation from the Microsoft Store.  If Kali is not installed on your system it will download the .AppX image directly from Microsoft and install it for you. 
+The install script is meant to be run on a new Kali Linux installation from the Microsoft Store.  If Kali is not installed on your system it will download the .AppX image directly from Microsoft and install it for you.
 
 **INSTRUCTIONS:  Open a NEW elevated command prompt window (admin rights are required to open firewall ports for RDP and SSH) then type/paste the following command:**
 
-    PowerShell -executionpolicy bypass -command "wget https://github.com/DesktopECHO/Kali-xRDP/raw/main/Kali-xRDP.cmd -UseBasicParsing -OutFile Kali-xRDP.cmd ; .\Kali-xRDP.cmd"
-    
+    PowerShell -executionpolicy bypass -command "wget https://github.com/gusDuarte/Kali-xRDP/raw/main/Kali-xRDP.cmd -UseBasicParsing -OutFile Kali-xRDP.cmd ; .\Kali-xRDP.cmd"
+
+To install Ubuntu 20.04 with Gnome desktop run following:
+
+    PowerShell -executionpolicy bypass -command "wget https://github.com/gusDuarte/Kali-xRDP/raw/main/Gnome-Xserver.cmd -UseBasicParsing -OutFile Gnome-Xserver.cmd ; .\Gnome-Xserver.cmd"
+
 You will be asked a few questions.  The installer script determines the current Windows DPI scaling of your system but you may set your own if preferred:
 
      [Kali xRDP Installer 20210225]
@@ -20,13 +24,13 @@ You will be asked a few questions.  The installer script determines the current 
      Port number for SSHd traffic or hit Enter for default [3322]:
      [Not recommended!] Type X to eXclude from Windows Defender:
 
-The script will download the [LxRunOffline](https://github.com/DDoSolitary/LxRunOffline) distro manager to bootstrap the installation.  Install times will vary depending on system performance and presence of antivirus software.  A fast system with broadband Internet can complete the install in under 10 minutes and most machines will complete within 20 minutes. 
+The script will download the [LxRunOffline](https://github.com/DDoSolitary/LxRunOffline) distro manager to bootstrap the installation.  Install times will vary depending on system performance and presence of antivirus software.  A fast system with broadband Internet can complete the install in under 10 minutes and most machines will complete within 20 minutes.
 
      [22:18:12] Prepare Distro (~1m00s)
      [22:19:08] Install xRDP and Kali-Linux-Core packages (~3m00s)
      [22:22:53] Kali-Desktop-XFCE (~5m00s)
      [22:30:39] Additional Components (~1m00s)
-   
+
 At the end of the script you will be prompted to create a non-root user which will automatically be added to sudo'ers.
 
      Create a NEW user in Kali for xRDP GUI login. Enter username: kaliuser
@@ -50,25 +54,25 @@ At the end of the script you will be prompted to create a non-root user which wi
 
       Installaion of xRDP GUI on "kali-linux" complete, graphical login will start in a few seconds...
 
-A fullscreen remote desktop session will launch Kali using your stored credentials.   
+A fullscreen remote desktop session will launch Kali using your stored credentials.
 
 **Configure Kali-xRDP to start at boot (like a service, no console window)**
 
-* Open the Windows Task Scheduler 
+* Open the Windows Task Scheduler
 * Right-click the task in Task Scheduler (kali-linux) and click properties
 * Click the checkbox for **Run whether user is logged on or not** and click **OK**
 * Enter your Windows credentials when prompted
- 
+
 Reboot your PC when complete and the xRDP service in Kali will startup automatically with your system.
 
 **Start/Stop Operation**
 
-* Start (or restart) the instance: ````schtasks /run /tn kali-linux```` 
+* Start (or restart) the instance: ````schtasks /run /tn kali-linux````
 * Terminate the instance: ````wslconfig /t kali-linux````
 
 **Convert to WSL2 instance**
 
-If your computer has virtualization support you can convert the instance to WSL2 (and back to WSL1 if needed.) 
+If your computer has virtualization support you can convert the instance to WSL2 (and back to WSL1 if needed.)
 
  - Terminate the instance:
     ````wslconfig /t kali-linux````
@@ -79,7 +83,7 @@ If your computer has virtualization support you can convert the instance to WSL2
 
 **Make it your own:**
 
-From a security perspective, you should fork this project so you control the packages and files in the repository.  This also allows you to customize the installer in any way you prefer: 
+From a security perspective, you should fork this project so you control the packages and files in the repository.  This also allows you to customize the installer in any way you prefer:
 
 - Sign into GitHub and fork this project
 - Edit ```Kali-xRDP.cmd```.  On line 2 you will see ```SET GITORG=DesktopECHO``` - Change ```DesktopECHO``` to the name of your own repository.
@@ -89,7 +93,7 @@ From a security perspective, you should fork this project so you control the pac
 
 **Additional Info:**
 
-* When you log out out of a desktop session the entire WSL instance is restarted, equivalent to a clean-boot at every login. 
+* When you log out out of a desktop session the entire WSL instance is restarted, equivalent to a clean-boot at every login.
 * Disconnected sessions continue to run in the background and resuming the session works reliably.
 * Enabled gksu for apps needing elevated rights (Synaptic, root console) to work around limitations in WSL1.
 * [apt-fast](https://github.com/ilikenwf/apt-fast) added to improve download speed and reliability.
