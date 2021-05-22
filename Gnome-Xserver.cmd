@@ -1,6 +1,6 @@
 @ECHO OFF & NET SESSION >NUL 2>&1
 IF %ERRORLEVEL% == 0 (ECHO Administrator check passed...) ELSE (ECHO You need to run this command with administrative rights.  Is User Account Control enabled? && pause && goto ENDSCRIPT)
-COLOR 1F
+
 SET GITORG=gusDuarte
 SET GITPRJ=Kali-xRDP
 SET BRANCH=main
@@ -23,7 +23,8 @@ REM ## Find system DPI setting and get installation parameters
 IF NOT EXIST "%TEMP%\windpi.ps1" POWERSHELL.EXE -ExecutionPolicy Bypass -Command "wget '%BASE%/windpi.ps1' -UseBasicParsing -OutFile '%TEMP%\windpi.ps1'"
 FOR /f "delims=" %%a in ('powershell -ExecutionPolicy bypass -command "%TEMP%\windpi.ps1" ') do set "WINDPI=%%a"
 
-CLS
+
+
 ECHO [Ubuntu Gnome-Xserver Installer 20210521]
 ECHO:
 ECHO Hit Enter to use your current display scaling in Windows
@@ -49,6 +50,13 @@ FOR /F %%A in ("apterr") do If %%~zA NEQ 0 GOTO APTRELY
 
 ECHO:
 ECHO [%TIME:~0,8%] Prepare Distro (~1m00s)
+REM ## Install apt-fast
+%GO% "DEBIAN_FRONTEND=noninteractive apt-get -y install git gnupg2 libc-ares2 libssh2-1 libaria2-0 aria2 --no-install-recommends ; cd /tmp ; rm -rf %GITPRJ% ; git clone -b %BRANCH% --depth=1 https://github.com/%GITORG%/%GITPRJ%.git ; chmod +x /tmp/Kali-xRDP/dist/usr/local/bin/apt-fast ; cp -p /tmp/Kali-xRDP/dist/usr/local/bin/apt-fast /usr/local/bin" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Prepare Distro.log" 2>&1
+
+ECHO [%TIME:~0,8%] Install Gnome desktop metapackage (~3m00s)
+%GO% "DEBIAN_FRONTEND=noninteractive apt-fast -y install ubuntu-desktop --no-install-recommends"  > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Gnome desktop.log" 2>&1
+
+
 
 SET RUNEND=%date% @ %time:~0,5%
 CD %DISTROFULL%
