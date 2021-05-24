@@ -59,7 +59,7 @@ ECHO [%TIME:~0,8%] Install Gnome desktop metapackage (~4m00s)
 
 REM ## Adding extra repos
 ECHO [%TIME:~0,8%] Adding extra repos (~30s)
-%GO% "username=$(wslvar USERNAME);mkdir --parents /mnt/c/users/$username/.ubuntu/;cd /mnt/c/users/$username/.ubuntu;apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc;sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main" > /etc/apt/sources.list.d/microsoft-prod.list'; apt update" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Adding extra repos.log" 2>&1
+%GO% "username=$(wslvar USERNAME);mkdir --parents /mnt/c/users/$username/.ubuntu/;cd /mnt/c/users/$username/.ubuntu;apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc;echo 'deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main > /etc/apt/sources.list.d/microsoft-prod.list'; apt update" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Adding extra repos.log" 2>&1
 
 SET RUNEND=%date% @ %time:~0,5%
 CD %DISTROFULL%
