@@ -20,8 +20,8 @@ IF NOT EXIST "%TEMP%\LxRunOffline.exe" POWERSHELL.EXE -Command "[Net.ServicePoin
 MKDIR %TEMP%\Kali-xRDP >NUL 2>&1
 
 REM ## Install .NET 5.0 Runtime
-PowerShell.exe -Command "{Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))}"
-PowerShell.exe -Command "{ choco install dotnet-5.0-runtime }"
+PowerShell.exe -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
+PowerShell.exe -Command "choco install dotnet-5.0-runtime -y"
 
 REM ## Insall Xserver
 
@@ -62,7 +62,7 @@ ECHO [%TIME:~0,8%] Install Gnome desktop metapackage (~4m00s)
 
 REM ## Adding extra repos
 ECHO [%TIME:~0,8%] Adding extra repos (~30s)
-%GO% "username=$(wslvar USERNAME);mkdir --parents /mnt/c/users/$username/.ubuntu/;cd /mnt/c/users/$username/.ubuntu;apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc;echo 'deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main > /etc/apt/sources.list.d/microsoft-prod.list'; apt update; apt upgrade -y" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Adding extra repos.log" 2>&1
+%GO% "username=$(wslvar USERNAME);mkdir --parents /mnt/c/users/$username/.ubuntu/;cd /mnt/c/users/$username/.ubuntu; apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc; echo 'deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main' > /etc/apt/sources.list.d/microsoft-prod.list; apt update; apt upgrade -y" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Adding extra repos.log" 2>&1
 
 REM ## Adding extra repos
 ECHO [%TIME:~0,8%] Adding extra repos 2 (~30s)
@@ -71,23 +71,26 @@ ECHO [%TIME:~0,8%] Adding extra repos 2 (~30s)
 
 REM ## Create ceibal user
 ECHO [%TIME:~0,8%] Create Ceibal user (~3s)
-%GO% "useradd -m ceibal; echo 'ceibal:ceibal' | chpasswd; usermod -aG sudo ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Create Ceibal user.log" 2>&1
+%GO% "useradd -m -s /bin/bash; echo 'ceibal:ceibal' | chpasswd; usermod -aG sudo ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Create Ceibal user.log" 2>&1
 
 REM ## Install Genie
 ECHO [%TIME:~0,8%] Install Genie (~3s)
 %GO% "apt update; apt install --yes systemd-genie" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Install Genie.log" 2>&1
 %GO% "echo 'ceibal ALL=(ALL) NOPASSWD:/usr/bin/genie' |  EDITOR='tee' visudo --file /etc/sudoers.d/ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Add Genie to sudoers.log" 2>&1
 
+REM ## Create Start scripts
+PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/01_reload_vcxsrv.ps1' -UseBasicParsing -OutFile '$env:userprofile\.ubuntu\01_reload_vcxsrv.ps1'"
+PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/02_start_desktop.sh' -UseBasicParsing -OutFile '$env:userprofile\.ubuntu\02_start_desktop.sh'"
+PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/03_start_ubuntu.vbs' -UseBasicParsing -OutFile '$env:userprofile\.ubuntu\03_start_ubuntu.vbs'"
 
-
+PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/CreateShortcutIcon.ps1' -UseBasicParsing -OutFile '%TEMP%\CreateShortcutIcon.ps1'"
+PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%/CreateShortcutIcon.ps1"
 
 SET RUNEND=%date% @ %time:~0,5%
 CD %DISTROFULL%
 ECHO:
-START /MIN "%DISTRO% Init" WSL ~ -u root -d %DISTRO% -e initwsl 2
-
 ECHO:Installation of (%DISTRO%) complete
-%TEMP%\LxRunOffline.exe set-uid -n "%DISTRO%" -v 1001
+
 CD ..
 ECHO:
 :ENDSCRIPT
