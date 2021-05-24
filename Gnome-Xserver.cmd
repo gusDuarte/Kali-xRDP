@@ -19,6 +19,13 @@ REM ## Acquire LxRunOffline
 IF NOT EXIST "%TEMP%\LxRunOffline.exe" POWERSHELL.EXE -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; wget https://github.com/DDoSolitary/LxRunOffline/releases/download/v3.5.0/LxRunOffline-v3.5.0-msvc.zip -UseBasicParsing -OutFile '%TEMP%\LxRunOffline-v3.5.0-msvc.zip' ; Expand-Archive -Path '%TEMP%\LxRunOffline-v3.5.0-msvc.zip' -DestinationPath '%TEMP%' -Force" > NUL
 MKDIR %TEMP%\Kali-xRDP >NUL 2>&1
 
+REM ## Install .NET 5.0 Runtime
+PowerShell.exe -Command "{Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))}"
+PowerShell.exe -Command "{ choco install dotnet-5.0-runtime }"
+
+REM ## Insall Xserver
+
+
 REM ## Find system DPI setting and get installation parameters
 IF NOT EXIST "%TEMP%\windpi.ps1" POWERSHELL.EXE -ExecutionPolicy Bypass -Command "wget '%BASE%/windpi.ps1' -UseBasicParsing -OutFile '%TEMP%\windpi.ps1'"
 FOR /f "delims=" %%a in ('powershell -ExecutionPolicy bypass -command "%TEMP%\windpi.ps1" ') do set "WINDPI=%%a"
@@ -27,11 +34,7 @@ FOR /f "delims=" %%a in ('powershell -ExecutionPolicy bypass -command "%TEMP%\wi
 
 ECHO [Ubuntu Gnome-Xserver Installer 20210521]
 ECHO:
-ECHO Hit Enter to use your current display scaling in Windows
-SET /p WINDPI=or set the desired value (1.0 to 3.0 in .25 increments) [%WINDPI%]:
-FOR /f "delims=" %%a in ('PowerShell -Command 96 * "%WINDPI%" ') do set "LINDPI=%%a"
-FOR /f "delims=" %%a in ('PowerShell -Command 32 * "%WINDPI%" ') do set "PANEL=%%a"
-FOR /f "delims=" %%a in ('PowerShell -Command 48 * "%WINDPI%" ') do set "ICONS=%%a"
+
 SET DISTROFULL=%temp%
 CD %DISTROFULL%
 %TEMP%\LxRunOffline.exe su -n %DISTRO% -v 0
@@ -59,7 +62,24 @@ ECHO [%TIME:~0,8%] Install Gnome desktop metapackage (~4m00s)
 
 REM ## Adding extra repos
 ECHO [%TIME:~0,8%] Adding extra repos (~30s)
-%GO% "username=$(wslvar USERNAME);mkdir --parents /mnt/c/users/$username/.ubuntu/;cd /mnt/c/users/$username/.ubuntu;apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc;echo 'deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main > /etc/apt/sources.list.d/microsoft-prod.list'; apt update" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Adding extra repos.log" 2>&1
+%GO% "username=$(wslvar USERNAME);mkdir --parents /mnt/c/users/$username/.ubuntu/;cd /mnt/c/users/$username/.ubuntu;apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc;echo 'deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main > /etc/apt/sources.list.d/microsoft-prod.list'; apt update; apt upgrade -y" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Adding extra repos.log" 2>&1
+
+REM ## Adding extra repos
+ECHO [%TIME:~0,8%] Adding extra repos 2 (~30s)
+%GO% "apt install -y apt-transport-https; wget --output-document /etc/apt/trusted.gpg.d/wsl-transdebian.gpg https://arkane-systems.github.io/wsl-transdebian/apt/wsl-transdebian.gpg; chmod a+r /etc/apt/trusted.gpg.d/wsl-transdebian.gpg; echo 'deb https://arkane-systems.github.io/wsl-transdebian/apt/ focal main' > /etc/apt/sources.list.d/wsl-transdebian.list; echo 'deb-src https://arkane-systems.github.io/wsl-transdebian/apt/ focal main' >> /etc/apt/sources.list.d/wsl-transdebian.list;" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Adding extra repos2.log" 2>&1
+
+
+REM ## Create ceibal user
+ECHO [%TIME:~0,8%] Create Ceibal user (~3s)
+%GO% "useradd -m ceibal; echo 'ceibal:ceibal' | chpasswd; usermod -aG sudo ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Create Ceibal user.log" 2>&1
+
+REM ## Install Genie
+ECHO [%TIME:~0,8%] Install Genie (~3s)
+%GO% "apt update; apt install --yes systemd-genie" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Install Genie.log" 2>&1
+%GO% "echo 'ceibal ALL=(ALL) NOPASSWD:/usr/bin/genie' |  EDITOR='tee' visudo --file /etc/sudoers.d/ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Add Genie to sudoers.log" 2>&1
+
+
+
 
 SET RUNEND=%date% @ %time:~0,5%
 CD %DISTROFULL%
