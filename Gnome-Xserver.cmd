@@ -79,11 +79,11 @@ ECHO [%TIME:~0,8%] Install Genie (~3s)
 %GO% "echo 'ceibal ALL=(ALL) NOPASSWD:/usr/bin/genie' |  EDITOR='tee' visudo --file /etc/sudoers.d/ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Add Genie to sudoers.log" 2>&1
 
 REM ## Create Start scripts
-PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/01_reload_vcxsrv.ps1' -UseBasicParsing -OutFile '$env:userprofile\.ubuntu\01_reload_vcxsrv.ps1'"
-PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/02_start_desktop.sh' -UseBasicParsing -OutFile '$env:userprofile\.ubuntu\02_start_desktop.sh'"
-PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/03_start_ubuntu.vbs' -UseBasicParsing -OutFile '$env:userprofile\.ubuntu\03_start_ubuntu.vbs'"
+PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/01_reload_vcxsrv.ps1' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\01_reload_vcxsrv.ps1"
+PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/02_start_desktop.sh' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\02_start_desktop.sh"
+PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/03_start_ubuntu.vbs' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\03_start_ubuntu.vbs"
 
-PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/CreateShortcutIcon.ps1' -UseBasicParsing -OutFile '%TEMP%\CreateShortcutIcon.ps1'"
+PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/CreateShortcutIcon.ps1' -UseBasicParsing -OutFile %TEMP%\CreateShortcutIcon.ps1"
 PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%/CreateShortcutIcon.ps1"
 
 SET RUNEND=%date% @ %time:~0,5%
