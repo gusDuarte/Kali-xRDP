@@ -5,14 +5,14 @@ SET GITORG=gusDuarte
 SET GITPRJ=Kali-xRDP
 SET BRANCH=main
 SET BASE=https://github.com/%GITORG%/%GITPRJ%/raw/%BRANCH%
-SET DISTRO=Ubuntu
+SET DISTRO=Ubuntu-20.04
 
 REM ## Enable WSL if needed
 PowerShell.exe -Command "$WSL = Get-WindowsOptionalFeature -Online -FeatureName 'Microsoft-Windows-Subsystem-Linux' ; if ($WSL.State -eq 'Disabled') {Enable-WindowsOptionalFeature -FeatureName $WSL.FeatureName -Online}"
 SET RUNSTART=%date% @ %time:~0,5%
 
 REM ## Install Ubuntu from AppStore if needed
-PowerShell.exe -Command "wsl -d %DISTRO% -e 'uname' > $env:TEMP\DistroTestAlive.TMP ; $alive = Get-Content $env:TEMP\DistroTestAlive.TMP ; IF ($Alive -ne 'Linux') { Start-BitsTransfer https://aka.ms/wslubuntu2004 -Destination $env:TEMP\Ubuntu2004.AppX ; Add-AppxPackage $env:TEMP\Ubuntu2004.AppX ; Ubuntu.exe install --root }"
+PowerShell.exe -Command "wsl -d %DISTRO% -e 'uname' > $env:TEMP\DistroTestAlive.TMP ; $alive = Get-Content $env:TEMP\DistroTestAlive.TMP ; IF ($Alive -ne 'Linux') { Invoke-WebRequest -Uri https://aka.ms/wslubuntu2004 -OutFile Ubuntu.appx -UseBasicParsing -Destination $env:TEMP\Ubuntu2004.AppX ; Add-AppxPackage $env:TEMP\Ubuntu2004.AppX ; Ubuntu.exe install --root }"
 
 
 REM ## Acquire LxRunOffline
@@ -24,7 +24,7 @@ PowerShell.exe -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [Syst
 PowerShell.exe -Command "choco install dotnet-5.0-runtime -y"
 
 REM ## Insall Xserver
-
+REM https://sourceforge.net/projects/vcxsrv/files/latest/download
 
 REM ## Find system DPI setting and get installation parameters
 IF NOT EXIST "%TEMP%\windpi.ps1" POWERSHELL.EXE -ExecutionPolicy Bypass -Command "wget '%BASE%/windpi.ps1' -UseBasicParsing -OutFile '%TEMP%\windpi.ps1'"
@@ -71,7 +71,7 @@ REM ## Create ceibal user
 ECHO [%TIME:~0,8%] Create Ceibal user (~3s)
 %GO% "useradd -m -s /bin/bash ceibal; echo 'ceibal:ceibal' | chpasswd; usermod -aG sudo ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Create Ceibal user.log" 2>&1
 %GO% "echo 'ceibal ALL=(ALL) NOPASSWD:ALL' |  EDITOR='tee' visudo --file /etc/sudoers.d/ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Add user Ceibal to sudoers.log" 2>&1
-ubuntu config --default-user ceibal
+Ubuntu2004.exe config --default-user ceibal
 
 REM ## Install Genie
 ECHO [%TIME:~0,8%] Install Genie (~3s)
@@ -82,6 +82,8 @@ REM ## Create Start scripts
 PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/01_reload_vcxsrv.ps1' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\01_reload_vcxsrv.ps1"
 PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/02_start_desktop.sh' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\02_start_desktop.sh"
 PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/03_start_ubuntu.vbs' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\03_start_ubuntu.vbs"
+
+%GO% "username=$(wslvar USERNAME); sed -i 's/USER_WIN/'"$$username"'/g' /mnt/c/users/$username/.ubuntu/03_start_ubuntu.vbs"
 
 PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/CreateShortcutIcon.ps1' -UseBasicParsing -OutFile %TEMP%\CreateShortcutIcon.ps1"
 PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%/CreateShortcutIcon.ps1"
