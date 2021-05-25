@@ -72,11 +72,13 @@ ECHO [%TIME:~0,8%] Adding extra repos 2 (~30s)
 REM ## Create ceibal user
 ECHO [%TIME:~0,8%] Create Ceibal user (~3s)
 %GO% "useradd -m -s /bin/bash; echo 'ceibal:ceibal' | chpasswd; usermod -aG sudo ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Create Ceibal user.log" 2>&1
+%GO% "echo 'ceibal ALL=(ALL) NOPASSWD:ALL' |  EDITOR='tee' visudo --file /etc/sudoers.d/ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Add user Ceibal to sudoers.log" 2>&1
+ubuntu config --default-user ceibal
 
 REM ## Install Genie
 ECHO [%TIME:~0,8%] Install Genie (~3s)
-%GO% "apt update; apt install --yes systemd-genie" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Install Genie.log" 2>&1
-%GO% "echo 'ceibal ALL=(ALL) NOPASSWD:/usr/bin/genie' |  EDITOR='tee' visudo --file /etc/sudoers.d/ceibal" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Add Genie to sudoers.log" 2>&1
+%GO% "sudo apt update;sudo apt install --yes systemd-genie" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Install Genie.log" 2>&1
+
 
 REM ## Create Start scripts
 PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/01_reload_vcxsrv.ps1' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\01_reload_vcxsrv.ps1"
