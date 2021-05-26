@@ -86,6 +86,7 @@ REM ## Create Start scripts
 PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/01_reload_vcxsrv.ps1' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\01_reload_vcxsrv.ps1"
 PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/02_start_desktop.sh' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\02_start_desktop.sh"
 PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/03_start_ubuntu.vbs' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\03_start_ubuntu.vbs"
+PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/ubuntu.ico' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\ubuntu.ico"
 
 %GO% "username=$(wslvar USERNAME); sed -i 's/USER_WIN/'"$username"'/g' /mnt/c/users/$username/.ubuntu/03_start_ubuntu.vbs"
 
