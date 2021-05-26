@@ -7,16 +7,18 @@ SET BRANCH=main
 SET BASE=https://github.com/%GITORG%/%GITPRJ%/raw/%BRANCH%
 SET DISTRO=Ubuntu-20.04
 
+ECHO [Ubuntu Gnome-Xserver Installer 20210521]
+
 ECHO Enable WSL if needed
 PowerShell.exe -Command "$WSL = Get-WindowsOptionalFeature -Online -FeatureName 'Microsoft-Windows-Subsystem-Linux' ; if ($WSL.State -eq 'Disabled') {Enable-WindowsOptionalFeature -FeatureName $WSL.FeatureName -Online}"
 SET RUNSTART=%date% @ %time:~0,5%
 
 ECHO Install Ubuntu from AppStore if needed
-PowerShell.exe -Command "wsl -d %DISTRO% -e 'uname' > $env:TEMP\DistroTestAlive.TMP ; $alive = Get-Content $env:TEMP\DistroTestAlive.TMP ; IF ($Alive -ne 'Linux') { Invoke-WebRequest -Uri https://aka.ms/wslubuntu2004 -OutFile $env:TEMP\Ubuntu2004.AppX ; Add-AppxPackage $env:TEMP\Ubuntu2004.AppX ; Ubuntu2004.exe install --root }"
+PowerShell.exe -Command "wsl -d %DISTRO% -e 'uname' > $env:TEMP\DistroTestAlive.TMP ; $alive = Get-Content $env:TEMP\DistroTestAlive.TMP ; IF ($Alive -ne 'Linux') { Start-BitsTransfer -Source https://aka.ms/wslubuntu2004 -Destination $env:TEMP\Ubuntu2004.AppX ; Add-AppxPackage $env:TEMP\Ubuntu2004.AppX ; Ubuntu2004.exe install --root }"
 
 
 ECHO Acquire LxRunOffline
-IF NOT EXIST "%TEMP%\LxRunOffline.exe" POWERSHELL.EXE -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; wget https://github.com/DDoSolitary/LxRunOffline/releases/download/v3.5.0/LxRunOffline-v3.5.0-msvc.zip -UseBasicParsing -OutFile '%TEMP%\LxRunOffline-v3.5.0-msvc.zip' ; Expand-Archive -Path '%TEMP%\LxRunOffline-v3.5.0-msvc.zip' -DestinationPath '%TEMP%' -Force" > NUL
+IF NOT EXIST "%TEMP%\LxRunOffline.exe" POWERSHELL.EXE -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; Start-BitsTransfer -Source https://github.com/DDoSolitary/LxRunOffline/releases/download/v3.5.0/LxRunOffline-v3.5.0-msvc.zip -Destination '%TEMP%\LxRunOffline-v3.5.0-msvc.zip' ; Expand-Archive -Path '%TEMP%\LxRunOffline-v3.5.0-msvc.zip' -DestinationPath '%TEMP%' -Force" > NUL
 MKDIR %TEMP%\Kali-xRDP >NUL 2>&1
 
 ECHO Install chocolatey
@@ -29,12 +31,9 @@ ECHO Insall Xserver
 PowerShell.exe -Command "choco install vcxsrv -y"
 
 
-REM ## Find system DPI setting and get installation parameters
-IF NOT EXIST "%TEMP%\windpi.ps1" POWERSHELL.EXE -ExecutionPolicy Bypass -Command "wget '%BASE%/windpi.ps1' -UseBasicParsing -OutFile '%TEMP%\windpi.ps1'"
+ECHO Find system DPI setting and get installation parameters
+IF NOT EXIST "%TEMP%\windpi.ps1" POWERSHELL.EXE -ExecutionPolicy Bypass -Command "Start-BitsTransfer -Source '%BASE%/windpi.ps1' -Destination '%TEMP%\windpi.ps1'"
 FOR /f "delims=" %%a in ('powershell -ExecutionPolicy bypass -command "%TEMP%\windpi.ps1" ') do set "WINDPI=%%a"
-
-
-ECHO [Ubuntu Gnome-Xserver Installer 20210521]
 
 
 SET DISTROFULL=%temp%
@@ -44,7 +43,7 @@ SET GO="%DISTROFULL%\LxRunOffline.exe" r -n "%DISTRO%" -c
 
 
 ECHO Add exclusions in Windows Defender
-POWERSHELL.EXE -Command "wget %BASE%/excludeWSL.ps1 -UseBasicParsing -OutFile '%DISTROFULL%\excludeWSL.ps1'" & START /WAIT /MIN "Add exclusions in Windows Defender" "POWERSHELL.EXE" "-ExecutionPolicy" "Bypass" "-Command" ".\excludeWSL.ps1" "%DISTROFULL%" &  DEL ".\excludeWSL.ps1"
+POWERSHELL.EXE -Command "Start-BitsTransfer -Source %BASE%/excludeWSL.ps1 -Destination '%DISTROFULL%\excludeWSL.ps1'" & START /WAIT /MIN "Add exclusions in Windows Defender" "POWERSHELL.EXE" "-ExecutionPolicy" "Bypass" "-Command" ".\excludeWSL.ps1" "%DISTROFULL%" &  DEL ".\excludeWSL.ps1"
 
 
 ECHO Loop until we get a successful repo update
@@ -83,14 +82,14 @@ ECHO [%TIME:~0,8%] Install Genie (~3s)
 
 
 REM ## Create Start scripts
-PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/01_reload_vcxsrv.ps1' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\01_reload_vcxsrv.ps1"
-PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/02_start_desktop.sh' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\02_start_desktop.sh"
-PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/03_start_ubuntu.vbs' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\03_start_ubuntu.vbs"
-PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/ubuntu.ico' -UseBasicParsing -OutFile $env:userprofile\.ubuntu\ubuntu.ico"
+PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/01_reload_vcxsrv.ps1' -Destination $env:userprofile\.ubuntu\01_reload_vcxsrv.ps1"
+PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/02_start_desktop.sh' -Destination $env:userprofile\.ubuntu\02_start_desktop.sh"
+PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/03_start_ubuntu.vbs' -Destination $env:userprofile\.ubuntu\03_start_ubuntu.vbs"
+PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/ubuntu.ico' -Destination $env:userprofile\.ubuntu\ubuntu.ico"
 
 %GO% "username=$(wslvar USERNAME); sed -i 's/USER_WIN/'"$username"'/g' /mnt/c/users/$username/.ubuntu/03_start_ubuntu.vbs"
 
-PowerShell.exe -ExecutionPolicy bypass -command "wget '%BASE%/CreateShortcutIcon.ps1' -UseBasicParsing -OutFile %TEMP%\CreateShortcutIcon.ps1"
+PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/CreateShortcutIcon.ps1' -Destination %TEMP%\CreateShortcutIcon.ps1"
 PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%/CreateShortcutIcon.ps1"
 
 SET RUNEND=%date% @ %time:~0,5%
