@@ -1,4 +1,4 @@
-# [Kali-xRDP • GUI add-on for Kali Linux in WSL1 or 2 (v1.0 / 20210227)](https://github.com/DesktopECHO/Kali-xRDP)
+# WSL2 + Ubuntu 20.04 + Gnome
 
 Gnome-Xserver es un script que configura WSL2 e instala Ubuntu 20.04 con Gnome como entorno grafico.
 
