@@ -39,7 +39,7 @@ MKDIR %TEMP%\Kali-xRDP >NUL 2>&1
 
 ECHO:
 ECHO [%TIME:~0,8%] Install chocolatey
-PowerShell.exe -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
+PowerShell.exe -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
 
 ECHO:
 ECHO [%TIME:~0,8%] Install .NET 5.0 Runtime
@@ -109,6 +109,11 @@ PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BA
 
 PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/CreateShortcutIcon.ps1' -Destination %TEMP%\CreateShortcutIcon.ps1"
 PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%/CreateShortcutIcon.ps1"
+
+ECHO:
+ECHO [%TIME:~0,8%] Reiniciando WSL ...
+wsl --shutdown
+%GO% "exit"
 
 SET RUNEND=%date% @ %time:~0,5%
 CD %DISTROFULL%
