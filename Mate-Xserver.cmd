@@ -53,13 +53,9 @@ IF EXIST apterr DEL apterr
 START /MIN /WAIT "apt-get update" %GO% "apt-get update 2> apterr"
 FOR /F %%A in ("apterr") do If %%~zA NEQ 0 GOTO APTRELY
 
-@REM REM ## Install MATE-Desktop
-@REM ECHO [%TIME:~0,8%] Install Gnome desktop metapackage (~4m00s)
-@REM %GO% "DEBIAN_FRONTEND=noninteractive apt -y install ubuntu-desktop --no-install-recommends"  > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Gnome desktop.log" 2>&1
-
-ECHO:
-ECHO [%TIME:~0,8%] Adding extra repos (~30s)
-%GO% "username=$(wslvar USERNAME);mkdir --parents /mnt/c/users/$username/.ubuntu/;cd /mnt/c/users/$username/.ubuntu; apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc; echo 'deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main' > /etc/apt/sources.list.d/microsoft-prod.list; apt update; apt upgrade -y" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Adding extra repos.log" 2>&1
+REM ## Install MATE-Desktop
+ECHO [%TIME:~0,8%] Install Gnome desktop metapackage (~4m00s)
+%GO% "DEBIAN_FRONTEND=noninteractive apt -y install tasksel; tasksel install ubuntu-mate-desktop"  > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Gnome desktop.log" 2>&1
 
 
 ECHO:
@@ -70,15 +66,16 @@ Ubuntu2004.exe config --default-user ceibal
 
 ECHO:
 ECHO [%TIME:~0,8%] Create startup scripts (~3s)
+%GO% "username=$(wslvar USERNAME);mkdir --parents /mnt/c/users/$username/.ubuntu/"
 PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/01_reload_vcxsrv.ps1' -Destination $env:userprofile\.ubuntu\01_reload_vcxsrv.ps1"
-PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/02_start_desktop.sh' -Destination $env:userprofile\.ubuntu\02_start_desktop.sh"
-PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/03_start_ubuntu.vbs' -Destination $env:userprofile\.ubuntu\03_start_ubuntu.vbs"
+PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/02_start_mate.sh' -Destination $env:userprofile\.ubuntu\02_start_mate.sh"
+PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/03_start_mate.vbs' -Destination $env:userprofile\.ubuntu\03_start_mate.vbs"
 PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/ubuntu.ico' -Destination $env:userprofile\.ubuntu\ubuntu.ico"
 
-%GO% "username=$(wslvar USERNAME); sed -i 's/USER_WIN/'"$username"'/g' /mnt/c/users/$username/.ubuntu/03_start_ubuntu.vbs"
+%GO% "username=$(wslvar USERNAME); sed -i 's/USER_WIN/'"$username"'/g' /mnt/c/users/$username/.ubuntu/03_start_mate.vbs"
 
-PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/CreateShortcutIcon.ps1' -Destination %TEMP%\CreateShortcutIcon.ps1"
-PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%/CreateShortcutIcon.ps1"
+PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/CreateShortcutIcon.ps1' -Destination %TEMP%\CreateShortcutIcon-mate.ps1"
+PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%/CreateShortcutIcon-mate.ps1"
 
 ECHO:
 ECHO [%TIME:~0,8%] Reiniciando WSL ...
