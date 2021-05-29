@@ -102,6 +102,10 @@ PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BA
 PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%/CreateShortcutIcon.ps1"
 
 ECHO:
+ECHO [%TIME:~0,8%] Add inbound rule on Windows Defender for Xserver.
+PowerShell.exe -ExecutionPolicy bypass -command "New-NetFirewallRule -DisplayName 'Xserver' -Direction Inbound -Program %ProgramFiles%\VcXsrv\vcxsrv.exe -Action Allow"
+
+ECHO:
 ECHO [%TIME:~0,8%] Reiniciando WSL ...
 wsl --shutdown
 %GO% "exit"
