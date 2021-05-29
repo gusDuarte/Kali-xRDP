@@ -62,10 +62,10 @@ REM ## Install apt-fast
 REM ## Install MATE-Desktop
 ECHO [%TIME:~0,8%] Install Mate desktop metapackage (~4m00s)
 
-@REM ## Classic Mate fashion
+@REM ## Ubuntu Mate fashion
 %GO% "DEBIAN_FRONTEND=noninteractive apt-fast -y install  --no-install-recommends ubuntu-mate-core ubuntu-mate-desktop"  > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Mate desktop.log" 2>&1
 
-@REM ## Ubuntu Mate fashion
+@REM ## Classic Mate fashion
 @REM %GO% "DEBIAN_FRONTEND=noninteractive apt-fast -y install --no-install-recommends mate-desktop-environment mate-desktop-environment-extra"  > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Mate desktop.log" 2>&1
 
 ECHO:
@@ -89,7 +89,7 @@ PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%/CreateShortcutIcon-mate.
 
 ECHO:
 ECHO [%TIME:~0,8%] Add inbound rule on Windows Defender for Xserver.
-PowerShell.exe -ExecutionPolicy bypass -command "New-NetFirewallRule -DisplayName 'Xserver' -Direction Inbound -Program %ProgramFiles%\VcXsrv\vcxsrv.exe -Action Allow"
+PowerShell.exe -ExecutionPolicy bypass -command "New-NetFirewallRule -DisplayName 'Xserver' -Direction Inbound -Program '%ProgramFiles%\VcXsrv\vcxsrv.exe' -Action Allow"
 
 ECHO:
 ECHO [%TIME:~0,8%] Reiniciando WSL ...
