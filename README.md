@@ -14,4 +14,4 @@ Esta basado en el proyecto "Kali-xRDP (https://github.com/DesktopECHO/Kali-xRDP)
     PowerShell -executionpolicy bypass -command "wget https://github.com/gusDuarte/Kali-xRDP/raw/main/Mate-Xserver.cmd -UseBasicParsing -OutFile Mate-Xserver.cmd ; .\Mate-Xserver.cmd"
 
 ## Mate WSL2
-    PowerShell -executionpolicy bypass -command "wget https://github.com/gusDuarte/Kali-xRDP/raw/main/Mate-Xsrv-WSL2.cmd -UseBasicParsing -OutFile Mate-Xsrv-WSL2.cmd ; .\Mate-Xserver.cmd"
+    PowerShell -executionpolicy bypass -command "wget https://github.com/gusDuarte/Kali-xRDP/raw/main/Mate-Xsrv-WSL2.cmd -UseBasicParsing -OutFile Mate-Xsrv-WSL2.cmd ; .\Mate-Xsrv-WSL2.cmd"
