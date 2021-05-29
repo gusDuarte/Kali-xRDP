@@ -61,8 +61,12 @@ REM ## Install apt-fast
 
 REM ## Install MATE-Desktop
 ECHO [%TIME:~0,8%] Install Mate desktop metapackage (~4m00s)
-%GO% "DEBIAN_FRONTEND=noninteractive apt-fast -y install mate"  > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Mate desktop.log" 2>&1
 
+@REM ## Classic Mate fashion
+%GO% "DEBIAN_FRONTEND=noninteractive apt-fast -y install  --no-install-recommends ubuntu-mate-core ubuntu-mate-desktop"  > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Mate desktop.log" 2>&1
+
+@REM ## Ubuntu Mate fashion
+@REM %GO% "DEBIAN_FRONTEND=noninteractive apt-fast -y install --no-install-recommends mate-desktop-environment mate-desktop-environment-extra"  > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Mate desktop.log" 2>&1
 
 ECHO:
 ECHO [%TIME:~0,8%] Create Ceibal user (~3s)
