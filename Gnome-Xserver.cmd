@@ -11,13 +11,13 @@ ECHO [Ubuntu Gnome-Xserver Installer 20210521]
 ECHO:
 ECHO:
 
-ECHO [%TIME:~0,8%] Check if WSL is enabled, if not, it will enable and restart.
+ECHO [%TIME:~0,8%] Check if WSL is enabled, if not, enable and RESTART !!!.
 PowerShell.exe -Command "$WSL = Get-WindowsOptionalFeature -Online -FeatureName 'Microsoft-Windows-Subsystem-Linux' ; if ($WSL.State -eq 'Disabled') {dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart; Restart-Computer }"
 SET RUNSTART=%date% @ %time:~0,5%
 
 ECHO:
-ECHO [%TIME:~0,8%] Enable Virtual Machine feature
-PowerShell.exe -Command "IF (Test-Path $env:TEMP\vmenable.TMP) {$do = Get-Content $env:TEMP\vmenable.TMP} ELSE {$do = 'no'}; IF ($do -ne 'done') {dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart}; ECHO 'done' > $env:TEMP\vmenable.TMP"
+ECHO [%TIME:~0,8%] Check if Virtual Machine feature is enabled, it not, enable and RESTART !!!
+PowerShell.exe -Command "IF (Test-Path $env:TEMP\vmenable.TMP) {$do = Get-Content $env:TEMP\vmenable.TMP} ELSE {$do = 'no'}; IF ($do -ne 'done') {dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart}; ECHO 'done' > $env:TEMP\vmenable.TMP; Restart-Computer"
 ECHO:
 ECHO [%TIME:~0,8%] Download and Install Linux Kernel Update
 PowerShell.exe -Command "IF (Test-Path $env:TEMP\kernelupdate.TMP) {$do = Get-Content $env:TEMP\kernelupdate.TMP} ELSE {$do = 'no'}; IF ($do -ne 'done') {Start-BitsTransfer -Source https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi -Destination $env:TEMP\wsl_update_x64.msi ; Start-Process $env:TEMP\wsl_update_x64.msi -ArgumentList '/quiet /passive'; ECHO 'done' > $env:TEMP\kernelupdate.TMP}"
@@ -59,9 +59,9 @@ CD %DISTROFULL%
 %TEMP%\LxRunOffline.exe su -n %DISTRO% -v 0
 SET GO="%DISTROFULL%\LxRunOffline.exe" r -n "%DISTRO%" -c
 
-ECHO:
-ECHO [%TIME:~0,8%] Add exclusions in Windows Defender
-POWERSHELL.EXE -Command "Start-BitsTransfer -Source %BASE%/excludeWSL.ps1 -Destination '%DISTROFULL%\excludeWSL.ps1'" & START /WAIT /MIN "Add exclusions in Windows Defender" "POWERSHELL.EXE" "-ExecutionPolicy" "Bypass" "-Command" ".\excludeWSL.ps1" "%DISTROFULL%" &  DEL ".\excludeWSL.ps1"
+@REM ECHO:
+@REM ECHO [%TIME:~0,8%] Add exclusions in Windows Defender
+@REM POWERSHELL.EXE -Command "Start-BitsTransfer -Source %BASE%/excludeWSL.ps1 -Destination '%DISTROFULL%\excludeWSL.ps1'" & START /WAIT /MIN "Add exclusions in Windows Defender" "POWERSHELL.EXE" "-ExecutionPolicy" "Bypass" "-Command" ".\excludeWSL.ps1" "%DISTROFULL%" &  DEL ".\excludeWSL.ps1"
 
 ECHO:
 ECHO [%TIME:~0,8%] Loop until we get a successful repo update
@@ -73,7 +73,7 @@ FOR /F %%A in ("apterr") do If %%~zA NEQ 0 GOTO APTRELY
 ECHO:
 ECHO [%TIME:~0,8%] Upgrade distro packages (~5m00s)
 REM ## Install apt-fast
-%GO% "DEBIAN_FRONTEND=noninteractive apt update;DEBIAN_FRONTEND=noninteractive apt upgrade -y; DEBIAN_FRONTEND=noninteractive apt-get -y install git gnupg2 libc-ares2 libssh2-1 libaria2-0 aria2 --no-install-recommends ; cd /tmp ; rm -rf %GITPRJ% ; git clone -b %BRANCH% --depth=1 https://github.com/%GITORG%/%GITPRJ%.git ; chmod +x /tmp/Kali-xRDP/dist/usr/local/bin/apt-fast ; cp -p /tmp/Kali-xRDP/dist/usr/local/bin/apt-fast /usr/local/bin" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Prepare Distro.log" 2>&1
+%GO% "DEBIAN_FRONTEND=noninteractive apt upgrade -y; DEBIAN_FRONTEND=noninteractive apt-get -y install git gnupg2 libc-ares2 libssh2-1 libaria2-0 aria2 --no-install-recommends ; cd /tmp ; rm -rf %GITPRJ% ; git clone -b %BRANCH% --depth=1 https://github.com/%GITORG%/%GITPRJ%.git ; chmod +x /tmp/Kali-xRDP/dist/usr/local/bin/apt-fast ; cp -p /tmp/Kali-xRDP/dist/usr/local/bin/apt-fast /usr/local/bin" > "%TEMP%\Kali-xRDP\%TIME:~0,2%%TIME:~3,2%%TIME:~6,2% Prepare Distro.log" 2>&1
 
 REM ## Install Gnome-Desktop
 ECHO [%TIME:~0,8%] Install Gnome desktop metapackage (~4m00s)
