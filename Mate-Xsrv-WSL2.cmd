@@ -15,7 +15,7 @@ REM ##
 REM ## Enable WSL2
 REM ##
 PowerShell.exe -ExecutionPolicy bypass -command "Start-BitsTransfer -Source '%BASE%/EnableWSL2.ps1' -Destination $env:TEMP\EnableWSL2.ps1;"
-PowerShell.exe -ExecutionPolicy bypass -command "$env:TEMP\EnableWSL2.ps1"
+PowerShell.exe -ExecutionPolicy bypass -command "%TEMP%\EnableWSL2.ps1"
 
 
 
