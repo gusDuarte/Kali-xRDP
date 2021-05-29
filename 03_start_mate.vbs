@@ -8,4 +8,4 @@ dim shell_object, command_object, standard_output_string
 ' Check whether shell is inside the container
 set shell_object = createobject("wscript.shell")
 
-shell_object.run "wsl bash /mnt/c/users/USER_WIN/.ubuntu/02_start_mate.sh"", 0
+shell_object.run "wsl bash /mnt/c/users/USER_WIN/.ubuntu/02_start_mate.sh", 0
